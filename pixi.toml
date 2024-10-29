@@ -1,0 +1,85 @@
+[project]
+name = "scene-reconstruction"
+authors = ["Jonas Kälble <jonas.kaelble@de.bosch.com>"]
+description = 'Implementation for "Accurate Training Data for Occupancy Map Prediction in Automated Driving Using Evidence Theory" (CVPR 2024)'
+platforms = ["linux-64"]
+version = "0.1.0"
+channels = [
+    "nvidia/label/cuda-11.6.2",
+    "nvidia/label/cuda-11.6.1",
+    "nvidia/label/cuda-11.6.0",
+    "conda-forge",
+    "pytorch",
+]
+readme = "README.md"
+license = "AGPL-3.0"
+
+[tasks]
+# Preprocessing
+transmissions-reflections = "python -m scene_reconstruction.cli.main export ./conf default transmissions-reflections"
+scene-flow = "python -m scene_reconstruction.cli.main export ./conf default scene-flow"
+temporal-accumulation = "python -m scene_reconstruction.cli.main export ./conf default temporal-accumulation"
+data-processing = { depends-on = [
+    "transmissions-reflections",
+    "scene-flow",
+    "temporal-accumulation",
+] }
+# Evaluation
+eval-bba04 = "python -m scene_reconstruction.cli.main eval ./conf bba04 render-lidar-depth"
+eval-bba = "python -m scene_reconstruction.cli.main eval ./conf bba render-lidar-depth"
+eval-occ3d = "python -m scene_reconstruction.cli.main eval ./conf occ3d render-lidar-depth"
+eval-open-occupancy = "python -m scene_reconstruction.cli.main eval ./conf open_occupancy render-lidar-depth"
+eval-surround-occ = "python -m scene_reconstruction.cli.main eval ./conf surround_occ render-lidar-depth"
+eval-scene-as-occupancy = "python -m scene_reconstruction.cli.main eval ./conf scene_as_occupancy render-lidar-depth"
+eval-all = { depends-on = [
+    "eval-bba04",
+    "eval-bba",
+    "eval-occ3d",
+    "eval-open-occupancy",
+    "eval-surround-occ",
+    "eval-scene-as-occupancy",
+] }
+
+[dependencies]
+python = "3.9.*"
+binutils = "*"
+cxx-compiler = "*"
+git = "*"
+gxx = "<12"
+libcusolver-dev = "*"
+ninja = "*"
+numba = "*"
+numpy = "<1.24"
+opencv = "*"
+pip = "*"
+cuda = { version = "11.6.*", channel = "nvidia/label/cuda-11.6.0" }
+pytorch = { version = "1.12.*", channel = "pytorch" }
+pytorch-cuda = { version = "11.6.*", channel = "pytorch" }
+torchvision = { version = "*", channel = "pytorch" }
+mkl = "2020.0.*"
+scipy = "*"
+
+[pypi-dependencies]
+scene-reconstruction = { path = ".", editable = true }
+einops = "*"
+hydra-core = "*"
+ipympl = "*"
+jupyter = "*"
+notebook = "*"
+open3d = "*"
+polars = "*"
+rich = "*"
+spconv-cu116 = "*"
+typer = "*"
+pyarrow = "*"
+streamlit = "*"
+seaborn = "*"
+torchmetrics = "*"
+nuscenes-devkit = "*"
+kaolin = "~=0.14"
+
+[pypi-options]
+index-url = "https://pypi.org/simple"
+find-links = [
+    { url = "https://nvidia-kaolin.s3.us-east-2.amazonaws.com/torch-1.12.0_cu116.html" },
+]

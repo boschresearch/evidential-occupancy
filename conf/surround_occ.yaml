@@ -1,0 +1,19 @@
+eval:
+  render_lidar_depth:
+    _target_: scene_reconstruction.eval.lidar_depth.LidarDistanceEval
+    ds:
+      _target_: scene_reconstruction.data.nuscenes.dataset.NuscenesDataset
+      data_root: data/nuscenes
+      extra_data_root: data/nuscenes_extra
+      version: v1.0-mini
+      key_frames_only: true
+    lower: [-50.0, -50.0, -5.0]
+    upper: [50.0, 50.0, 3.0]
+    volume_frame: lidar
+    eval_ego_lower: [-40.0, -40.0, -1.0]
+    eval_ego_upper: [40.0, 40.0, 5.4]
+    min_distance: 2.5
+    batch_size: 1
+    method: surround_occ
+    split: trainval
+    save_path: workdir/surround_occ

@@ -1,0 +1,66 @@
+data:
+  nuscenes:
+    _target_: scene_reconstruction.data.nuscenes.dataset.NuscenesDataset
+    data_root: data/nuscenes
+    version: v1.0-mini
+    key_frames_only: false
+
+volume:
+  ego_lower: [-40.0, -40.0, -1.0]
+  ego_upper: [40.0, 40.0, 5.4]
+  ego_shape: [400, 400, 32]
+  spherical_lower: [2.5, 1.3089969389957472, -3.141592653589793] #[0.0, (90 - 15) / 180 * math.pi, -math.pi]
+  spherical_upper: [60.0, 2.1816615649929116, 3.141592653589793] #[0.0, (90 + 35) / 180 * math.pi, -math.pi]
+  spherical_shape: [600, 100, 720] # voxel size [0.1m, 0.5°, 0.5°]
+  lidar_min_distance: 2.5
+
+export:
+  transmissions_reflections:
+    _target_: scene_reconstruction.occupancy.transmission_reflection.ReflectionTransmissionSpherical
+    ds:
+      _target_: scene_reconstruction.data.nuscenes.dataset.NuscenesDataset
+      data_root: data/nuscenes
+      extra_data_root: data/nuscenes_extra
+      version: v1.0-mini
+      key_frames_only: false
+
+    extra_data_root: data/nuscenes_extra
+    spherical_lower: [2.5, 1.3089969389957472, -3.141592653589793] #[0.0, (90 - 15) / 180 * math.pi, -math.pi]
+    spherical_upper: [60.0, 2.1816615649929116, 3.141592653589793] #[0.0, (90 + 35) / 180 * math.pi, -math.pi]
+    spherical_shape: [600, 100, 720] # voxel size [0.1m, 0.5°, 0.5°]
+    lidar_min_distance: 2.5 # meters
+    # voxel_size cartesian = 0.2m
+    # voxel_size sperical : 0.1m, 0.5°, 0.5°
+    batch_size: 4
+
+  scene_flow:
+    _target_: scene_reconstruction.data.nuscenes.scene_flow.SceneFlow
+    ds:
+      _target_: scene_reconstruction.data.nuscenes.dataset.NuscenesDataset
+      data_root: data/nuscenes
+      extra_data_root: data/nuscenes_extra
+      version: v1.0-mini
+      key_frames_only: false
+
+    extra_data_root: data/nuscenes_extra
+    cartesian_lower: [-40.0, -40.0, -1.0]
+    cartesian_upper: [40.0, 40.0, 5.4]
+    cartesian_shape: [400, 400, 32]
+
+  temporal_accumulation:
+    _target_: scene_reconstruction.occupancy.temporal_transmission_and_reflection.TemporalTransmissionAndReflection
+    ds:
+      _target_: scene_reconstruction.data.nuscenes.dataset.NuscenesDataset
+      data_root: data/nuscenes
+      extra_data_root: data/nuscenes_extra
+      version: v1.0-mini
+      key_frames_only: false
+
+    extra_data_root: data/nuscenes_extra
+    frame_accumulation_kwargs:
+      icp_alignment: false
+      batch_size: 1
+      max_num_frames: 50
+      max_ego_pose_difference: 20.0
+      device: cuda
+      num_threads: 8

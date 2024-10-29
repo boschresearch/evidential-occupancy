@@ -1,0 +1,13 @@
+
+# pixi environments
+.pixi
+*.egg-info
+
+# data
+/data
+
+# workdir
+/workdir
+
+# python cache files
+__pycache__/
